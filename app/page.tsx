@@ -12,6 +12,7 @@ export default function Home() {
           <a
             className="pointer-events-none flex place-items-center gap-2 p-8 lg:pointer-events-auto lg:p-0"
             href="https://vercel.com?utm_source=create-next-app&utm_medium=appdir-template&utm_campaign=create-next-app"
+            //href="https://www.nytimes.com/crosswords/game/mini"
             target="_blank"
             rel="noopener noreferrer"
           >
