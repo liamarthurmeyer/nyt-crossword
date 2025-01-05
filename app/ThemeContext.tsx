@@ -12,22 +12,26 @@ interface ThemeContextProps {
 const ThemeContext = createContext<ThemeContextProps | undefined>(undefined);
 
 export const ThemeProvider = ({ children }: { children: ReactNode }) => {
-    const [theme, setTheme] = useState<Theme>('light');
+    const [theme, setTheme] = useState<Theme>(() => {
+        // Initialize from localStorage or system preference
+        if (typeof window !== 'undefined') {
+            return localStorage.getItem('theme') as Theme || 
+                (window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light');
+        }
+        return 'light';
+    });
 
     useEffect(() => {
-        // Load theme from localStorage or default to light
-        const storedTheme = localStorage.getItem('theme') as Theme;
-        if (storedTheme) {
-            setTheme(storedTheme);
-            document.documentElement.className = storedTheme;
-        }
-    }, []);
+        // Update HTML classes when theme changes
+        const root = window.document.documentElement;
+        root.classList.remove('light', 'dark');
+        root.classList.add(theme);
+        localStorage.setItem('theme', theme);
+    }, [theme]);
 
     const toggleTheme = () => {
         const newTheme = theme === 'light' ? 'dark' : 'light';
         setTheme(newTheme);
-        localStorage.setItem('theme', newTheme);
-        document.documentElement.className = newTheme;
     };
 
     return (
