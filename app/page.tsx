@@ -34,29 +34,13 @@ export default function Home() {
   const [completedDates, setCompletedDates] = useState<string[]>([]);
   const [loading, setLoading] = useState(true); // Loading state
 
-  const [iframeUrl, setIframeUrl] = useState<string | null>(null); // Manage iframe URL
-  const [showModal, setShowModal] = useState(false); // Manage modal visibility
-  const modalRef = useRef<HTMLDivElement>(null);
-  const [openInNewTab, setOpenInNewTab] = useState(false); // Default value without localStorage
-  const [showFirstTimeAlert, setShowFirstTimeAlert] = useState(true); // Default value without localStorage
-
-  // const [inputDate, setInputDate] = useState<string>(''); // For the date input field
-
   const { theme, toggleTheme } = useTheme();
 
   const [lastSelectedDate, setLastSelectedDate] = useState<Date | null>(null); // Store the last selected date
 
-  const [dontShowAgain, setDontShowAgain] = useState(false);
-
   useEffect(() => {
     // Only access localStorage in the browser
     if (typeof window !== 'undefined') {
-      const savedOpenInNewTab = localStorage.getItem("openInNewTab");
-      setOpenInNewTab(savedOpenInNewTab === "true");
-
-      const hideAlert = localStorage.getItem('hideLoginAlert');
-      setShowFirstTimeAlert(hideAlert !== 'true');
-
       // Load completed dates
       const storedDates = JSON.parse(localStorage.getItem('completedDates') || '[]');
       setCompletedDates(storedDates);
@@ -64,13 +48,8 @@ export default function Home() {
     setLoading(false);
   }, []);
 
-  useEffect(() => {
-    localStorage.setItem("openInNewTab", String(openInNewTab));
-  }, [openInNewTab]);
-
   const handleDateSelect = (selectedDate: Date | undefined) => {
     if (selectedDate) {
-      // Format the selected date
       const formattedDate = selectedDate.toISOString().split('T')[0].replace(/-/g, '/');
 
       // Save to localStorage
@@ -81,53 +60,16 @@ export default function Home() {
         setCompletedDates(updatedDates);
       }
 
-      // Navigate to the URL
+      // Navigate to the URL in new tab
       const url = `https://www.nytimes.com/crosswords/game/mini/${formattedDate}`;
-
-      if (openInNewTab) {
-        window.open(url, "_blank");
-      } else {
-        setIframeUrl(url); // Set iframe URL
-        setShowModal(true); // Open modal
-      }
-
-      // setDate(selectedDate);
-      setLastSelectedDate(selectedDate); // Keep track of the last selected date
-
+      window.open(url, "_blank");
+      setLastSelectedDate(selectedDate);
     }
   };
 
   useEffect(() => {
     console.log("Updated lastSelectedDate:", lastSelectedDate);
   }, [lastSelectedDate]);
-
-  const closeModal = useCallback(() => {
-    setShowModal(false);
-    setIframeUrl(null);
-  }, []);
-
-  useEffect(() => {
-    const handleOutsideClick = (event: MouseEvent) => {
-      if (modalRef.current && !modalRef.current.contains(event.target as Node)) {
-        closeModal();
-      }
-    };
-
-    if (showModal) {
-      document.addEventListener('mousedown', handleOutsideClick);
-    } else {
-      document.removeEventListener('mousedown', handleOutsideClick);
-    }
-    return () => {
-      document.removeEventListener('mousedown', handleOutsideClick);
-    };
-  }, [showModal, closeModal]);
-
-  // Convert completedDates to an array of Date objects
-  const completedDatesAsDates = completedDates.map((date) => {
-    const [year, month, day] = date.split('/').map(Number);
-    return new Date(year, month - 1, day); // Month is 0-indexed in Date
-  });
 
   const goToToday = () => {
     const latestPuzzleDate = getLatestAvailablePuzzle(); // Dynamically calculate the latest available puzzle
@@ -165,23 +107,6 @@ export default function Home() {
     // Navigate to the random puzzle
     handleDateSelect(randomDateObject);
   };
-
-  // const handleDateInputSubmit = () => {
-  //   if (inputDate) {
-  //     const [year, month, day] = inputDate.split('-').map(Number);
-  //     const selectedDate = new Date(year, month - 1, day);
-
-  //     // Validate date range
-  //     const startDate = new Date(2014, 7, 21); // August 21, 2014
-  //     const endDate = new Date();
-  //     if (selectedDate < startDate || selectedDate > endDate) {
-  //       alert('Please enter a date between August 21, 2014, and today.');
-  //       return;
-  //     }
-
-  //     handleDateSelect(selectedDate); // Redirect to the puzzle of the entered date
-  //   }
-  // };
 
   // Helper to get the current EST date and time
   const getESTDateTime = (): Date => {
@@ -235,13 +160,6 @@ export default function Home() {
               Configure your preferences.
             </SheetDescription>
             <div className="flex items-center space-x-4">
-              <span>Open Crosswords in New Tab</span>
-              <Switch
-                checked={openInNewTab}
-                onCheckedChange={setOpenInNewTab}
-              />
-            </div>
-            <div className="flex items-center space-x-4">
               <span>Dark Mode</span>
               <Switch
                 checked={theme === 'dark'}
@@ -265,7 +183,7 @@ export default function Home() {
                     <AlertDialogAction
                       onClick={() => {
                         localStorage.removeItem('completedDates');
-                        setCompletedDates([]); // Clear the state
+                        setCompletedDates([]);
                       }}
                     >
                       Clear Dates
@@ -320,7 +238,10 @@ export default function Home() {
               captionLayout="dropdown"
               className="rounded-md border bg-white p-3 dark:bg-gray-800 dark:border-gray-600"
               modifiers={{
-                completed: completedDatesAsDates,
+                completed: completedDates.map((date) => {
+                  const [year, month, day] = date.split('/').map(Number);
+                  return new Date(year, month - 1, day); // Month is 0-indexed in Date
+                }),
                 lastSelected: lastSelectedDate ? [lastSelectedDate] : [],
               }}
               modifiersClassNames={{
@@ -367,67 +288,6 @@ export default function Home() {
         </div>
         */
       }
-
-      {/* Modal */}
-      {showModal && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center z-50">
-          <div
-            ref={modalRef}
-            className="bg-white rounded-lg w-[90%] h-[90%] p-4 relative"
-          >
-            <div className="relative w-full h-full">
-              {/* Iframe for the crossword */}
-              <iframe
-                src={iframeUrl || ''}
-                width="100%"
-                height="100%"
-                className="rounded-lg"
-              />
-
-              {/* Overlay just for the "Log In" button */}
-              <div
-                className="absolute"
-                style={{
-                  top: '10px', // Adjust based on the position of the "Log In" button
-                  right: '15px', // Adjust as needed
-                  width: '260px', // Approximate width of the button
-                  height: '36px', // Approximate height of the button
-                  backgroundColor: 'black', // Invisible overlay
-                  pointerEvents: 'all', // Block clicks on this region
-                }}
-              />
-            </div>
-          </div>
-        </div>
-      )}
-
-      {showFirstTimeAlert && (
-        <AlertDialog open={showFirstTimeAlert} onOpenChange={setShowFirstTimeAlert}>
-          <AlertDialogContent>
-            <AlertDialogHeader>
-              <AlertDialogTitle>Welcome to NYT Mini Archive!</AlertDialogTitle>
-              <AlertDialogDescription className="space-y-4">
-                <p>Please note: Logging into your NYT account is not supported within the app. If you would like to use your NYT account, please enable the &quot;Open Crosswords in New Tab&quot; setting in the Settings menu. Attempting to Log In or Create an Account inside the modal will cause an error.</p>
-                <div className="flex items-center space-x-2">
-                  <Checkbox
-                    id="dontShowAgain"
-                    checked={dontShowAgain}
-                    onCheckedChange={(checked: boolean) => setDontShowAgain(checked)}
-                  />
-                  <label htmlFor="dontShowAgain">Don&apos;t show this message again</label>
-                </div>
-              </AlertDialogDescription>
-            </AlertDialogHeader>
-            <AlertDialogFooter>
-              <AlertDialogAction onClick={() => {
-                if (dontShowAgain) {
-                  localStorage.setItem('hideLoginAlert', 'true');
-                }
-              }}>Got it</AlertDialogAction>
-            </AlertDialogFooter>
-          </AlertDialogContent>
-        </AlertDialog>
-      )}
 
     </main >
   );
