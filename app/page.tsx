@@ -37,10 +37,8 @@ export default function Home() {
   const [iframeUrl, setIframeUrl] = useState<string | null>(null); // Manage iframe URL
   const [showModal, setShowModal] = useState(false); // Manage modal visibility
   const modalRef = useRef<HTMLDivElement>(null);
-  const [openInNewTab, setOpenInNewTab] = useState(() => {
-    const savedOpenInNewTab = localStorage.getItem("openInNewTab");
-    return savedOpenInNewTab === "true"; // Default to false if no value is found
-  });
+  const [openInNewTab, setOpenInNewTab] = useState(false); // Default value without localStorage
+  const [showFirstTimeAlert, setShowFirstTimeAlert] = useState(true); // Default value without localStorage
 
   // const [inputDate, setInputDate] = useState<string>(''); // For the date input field
 
@@ -48,24 +46,21 @@ export default function Home() {
 
   const [lastSelectedDate, setLastSelectedDate] = useState<Date | null>(null); // Store the last selected date
 
-  const [showFirstTimeAlert, setShowFirstTimeAlert] = useState(() => {
-    const hideAlert = localStorage.getItem('hideLoginAlert');
-    return hideAlert !== 'true';
-  });
-
   const [dontShowAgain, setDontShowAgain] = useState(false);
 
   useEffect(() => {
-
-    const savedOpenInNewTab = localStorage.getItem("openInNewTab");
-    if (savedOpenInNewTab) {
+    // Only access localStorage in the browser
+    if (typeof window !== 'undefined') {
+      const savedOpenInNewTab = localStorage.getItem("openInNewTab");
       setOpenInNewTab(savedOpenInNewTab === "true");
-    }
 
-    // Load completed dates from localStorage on mount
-    const storedDates = JSON.parse(localStorage.getItem('completedDates') || '[]');
-    setCompletedDates(storedDates);
-    // setDate(undefined);
+      const hideAlert = localStorage.getItem('hideLoginAlert');
+      setShowFirstTimeAlert(hideAlert !== 'true');
+
+      // Load completed dates
+      const storedDates = JSON.parse(localStorage.getItem('completedDates') || '[]');
+      setCompletedDates(storedDates);
+    }
     setLoading(false);
   }, []);
 
