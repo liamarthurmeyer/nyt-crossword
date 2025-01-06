@@ -5,7 +5,7 @@ import { Switch } from "@/components/ui/switch"
 import { DayPickerSkeleton } from "./DayPickerSkeleton";
 import Image from 'next/image';
 import { DayPicker } from 'react-day-picker';
-import { useState, useEffect, useRef } from 'react';
+import { useState, useEffect, useRef, useCallback } from 'react';
 import { useTheme } from './ThemeContext';
 import { Checkbox } from "@/components/ui/checkbox"
 
@@ -106,18 +106,18 @@ export default function Home() {
     console.log("Updated lastSelectedDate:", lastSelectedDate);
   }, [lastSelectedDate]);
 
-  const closeModal = () => {
+  const closeModal = useCallback(() => {
     setShowModal(false);
-    setIframeUrl(null); // Clear iframe URL
-  };
-
-  const handleOutsideClick = (event: MouseEvent) => {
-    if (modalRef.current && !modalRef.current.contains(event.target as Node)) {
-      closeModal();
-    }
-  };
+    setIframeUrl(null);
+  }, []);
 
   useEffect(() => {
+    const handleOutsideClick = (event: MouseEvent) => {
+      if (modalRef.current && !modalRef.current.contains(event.target as Node)) {
+        closeModal();
+      }
+    };
+
     if (showModal) {
       document.addEventListener('mousedown', handleOutsideClick);
     } else {
@@ -126,7 +126,7 @@ export default function Home() {
     return () => {
       document.removeEventListener('mousedown', handleOutsideClick);
     };
-  }, [showModal]);
+  }, [showModal, closeModal]);
 
   // Convert completedDates to an array of Date objects
   const completedDatesAsDates = completedDates.map((date) => {
@@ -289,7 +289,7 @@ export default function Home() {
           className="pointer-events-auto flex flex-col items-center gap-2 p-8 bg-transparent border-none cursor-pointer"
           onClick={goToToday}
         >
-          <h1 className="text-xl font-bold">Today's Mini</h1>
+          <h1 className="text-xl font-bold">Today&apos;s Mini</h1>
           <Image
             className="relative dark:drop-shadow-[0_0_0.3rem_#ffffff70]"
             src="/mini_logo.png"
@@ -410,9 +410,9 @@ export default function Home() {
         <AlertDialog open={showFirstTimeAlert} onOpenChange={setShowFirstTimeAlert}>
           <AlertDialogContent>
             <AlertDialogHeader>
-              <AlertDialogTitle>Welcome to NYT Mini Tracker!</AlertDialogTitle>
+              <AlertDialogTitle>Welcome to NYT Mini Archive!</AlertDialogTitle>
               <AlertDialogDescription className="space-y-4">
-                <p>Please note: Logging in to your NYT account is not supported within the app. If you would like to use your NYT account, please enable the &quot;Open Crosswords in New Tab&quot; setting in the Settings menu.</p>
+                <p>Please note: Logging into your NYT account is not supported within the app. If you would like to use your NYT account, please enable the &quot;Open Crosswords in New Tab&quot; setting in the Settings menu. Attempting to Log In or Create an Account inside the modal will cause an error.</p>
                 <div className="flex items-center space-x-2">
                   <Checkbox
                     id="dontShowAgain"
