@@ -5,9 +5,8 @@ import { Switch } from "@/components/ui/switch"
 import { DayPickerSkeleton } from "./DayPickerSkeleton";
 import Image from 'next/image';
 import { DayPicker } from 'react-day-picker';
-import { useState, useEffect, useRef, useCallback } from 'react';
+import { useState, useEffect } from 'react';
 import { useTheme } from './ThemeContext';
-import { Checkbox } from "@/components/ui/checkbox"
 
 import {
   Sheet,
@@ -38,12 +37,18 @@ export default function Home() {
 
   const [lastSelectedDate, setLastSelectedDate] = useState<Date | null>(null); // Store the last selected date
 
+  const [weekStartsMonday, setWeekStartsMonday] = useState(false);
+
   useEffect(() => {
     // Only access localStorage in the browser
     if (typeof window !== 'undefined') {
       // Load completed dates
       const storedDates = JSON.parse(localStorage.getItem('completedDates') || '[]');
       setCompletedDates(storedDates);
+
+      // Load week start preference
+      const storedWeekStart = localStorage.getItem('weekStartsMonday');
+      setWeekStartsMonday(storedWeekStart === 'true');
     }
     setLoading(false);
   }, []);
@@ -146,6 +151,11 @@ export default function Home() {
     return latestPuzzleDate;
   };
 
+  const handleWeekStartChange = (value: boolean) => {
+    setWeekStartsMonday(value);
+    localStorage.setItem('weekStartsMonday', value.toString());
+  };
+
   return (
     <main className="flex min-h-screen flex-col items-center justify-between p-24">
 
@@ -165,6 +175,72 @@ export default function Home() {
                 checked={theme === 'dark'}
                 onCheckedChange={toggleTheme}
               />
+            </div>
+            <div className="flex items-center space-x-4">
+              <span>Week Starts on Monday</span>
+              <Switch
+                checked={weekStartsMonday}
+                onCheckedChange={handleWeekStartChange}
+              />
+            </div>
+            <div className="flex flex-col gap-4 mt-6">
+              {/* Export Button */}
+              <Button
+                onClick={() => {
+                  const data = JSON.stringify(completedDates);
+                  const blob = new Blob([data], { type: 'application/json' });
+                  const url = URL.createObjectURL(blob);
+                  const a = document.createElement('a');
+                  a.href = url;
+                  a.download = 'nyt-mini-progress.json';
+                  document.body.appendChild(a);
+                  a.click();
+                  document.body.removeChild(a);
+                  URL.revokeObjectURL(url);
+                }}
+              >
+                Export Completed Dates
+              </Button>
+
+              {/* Import Button */}
+              <div className="flex flex-col gap-2">
+                <input
+                  type="file"
+                  id="importFile"
+                  className="hidden"
+                  accept=".json"
+                  onChange={(e) => {
+                    const file = e.target.files?.[0];
+                    if (file) {
+                      const reader = new FileReader();
+                      reader.onload = (event) => {
+                        try {
+                          const importedDates = JSON.parse(event.target?.result as string);
+                          if (Array.isArray(importedDates)) {
+                            setCompletedDates(importedDates);
+                            localStorage.setItem('completedDates', JSON.stringify(importedDates));
+
+                            // Show success dialog
+                            document.getElementById('successTrigger')?.click();
+                          } else {
+                            // Show error dialog for invalid format
+                            document.getElementById('errorTrigger')?.click();
+                          }
+                        } catch (error) {
+                          // Show error dialog for parsing error
+                          document.getElementById('errorTrigger')?.click();
+                        }
+                      };
+                      reader.readAsText(file);
+                    }
+                  }}
+                />
+                <Button
+                  onClick={() => document.getElementById('importFile')?.click()}
+                >
+                  Import Completed Dates
+                </Button>
+              </div>
             </div>
             <div className="mt-6">
               <AlertDialog>
@@ -236,6 +312,7 @@ export default function Home() {
               endMonth={getLatestAvailablePuzzle()}
               fixedWeeks={true}
               captionLayout="dropdown"
+              weekStartsOn={weekStartsMonday ? 1 : 0}
               className="rounded-md border bg-white p-3 dark:bg-gray-800 dark:border-gray-600"
               modifiers={{
                 completed: completedDates.map((date) => {
@@ -247,13 +324,12 @@ export default function Home() {
               modifiersClassNames={{
                 completed: 'bg-green-200 text-green-800 rounded-full dark:bg-green-700 dark:text-white',
                 lastSelected: '!bg-blue-200 !text-blue-800 rounded-full dark:bg-blue-700 dark:text-white',
+                today: '!text-blue-600 dark:!text-cyan-400',
               }}
             />
           </div>
         )}
       </div>
-
-
 
       {/* Random Puzzle Button */}
       <div className="mt-6">
@@ -265,29 +341,37 @@ export default function Home() {
         </button>
       </div>
 
-      {
-        /*
-        <div className="mt-6 flex flex-col items-center">
-          <h2 className="text-lg font-bold mb-2">Navigate to a Specific Puzzle</h2>
-          <div className="flex items-center gap-2">
-            <input
-              type="date"
-              className="border rounded-md p-2"
-              value={inputDate}
-              onChange={(e) => setInputDate(e.target.value)}
-              max={new Date().toISOString().split('T')[0]} // Restrict future dates
-              min="2014-08-21" // Restrict dates before the first crossword
-            />
-            <button
-              className="px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-700"
-              onClick={handleDateInputSubmit}
-            >
-              Go
-            </button>
-          </div>
-        </div>
-        */
-      }
+      {/* Success Alert Dialog */}
+      <AlertDialog>
+        <AlertDialogTrigger id="successTrigger" className="hidden" />
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Success!</AlertDialogTitle>
+            <AlertDialogDescription>
+              Your progress has been imported successfully.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogAction>OK</AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
+
+      {/* Error Alert Dialog */}
+      <AlertDialog>
+        <AlertDialogTrigger id="errorTrigger" className="hidden" />
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Error</AlertDialogTitle>
+            <AlertDialogDescription>
+              There was an error importing your progress. Please make sure you&apos;re using a valid export file.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogAction>OK</AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
 
     </main >
   );
