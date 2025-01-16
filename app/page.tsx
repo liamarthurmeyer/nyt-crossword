@@ -28,6 +28,9 @@ import {
   AlertDialogTitle,
   AlertDialogTrigger,
 } from "@/components/ui/alert-dialog"
+
+import { Checkbox } from "@/components/ui/checkbox"
+
 export default function Home() {
   // const [date, setDate] = useState<Date | undefined>(new Date());
   const [completedDates, setCompletedDates] = useState<string[]>([]);
@@ -38,6 +41,8 @@ export default function Home() {
   const [lastSelectedDate, setLastSelectedDate] = useState<Date | null>(null); // Store the last selected date
 
   const [weekStartsMonday, setWeekStartsMonday] = useState(false);
+
+  const [showWelcome, setShowWelcome] = useState(true);
 
   useEffect(() => {
     // Only access localStorage in the browser
@@ -51,6 +56,13 @@ export default function Home() {
       setWeekStartsMonday(storedWeekStart === 'true');
     }
     setLoading(false);
+  }, []);
+
+  useEffect(() => {
+    if (typeof window !== 'undefined') {
+      const dontShowAgain = localStorage.getItem('dontShowAgain') === 'true';
+      setShowWelcome(!dontShowAgain);
+    }
   }, []);
 
   const handleDateSelect = (selectedDate: Date | undefined) => {
@@ -156,6 +168,11 @@ export default function Home() {
     localStorage.setItem('weekStartsMonday', value.toString());
   };
 
+  const handleDontShowAgain = () => {
+    localStorage.setItem('dontShowAgain', 'true');
+    setShowWelcome(false);
+  };
+
   return (
     <main className="flex min-h-screen flex-col items-center justify-between p-24">
 
@@ -183,7 +200,7 @@ export default function Home() {
                 onCheckedChange={handleWeekStartChange}
               />
             </div>
-            <div className="flex flex-col gap-4 mt-6">
+            <div className="flex flex-col gap-2">
               {/* Export Button */}
               <Button
                 onClick={() => {
@@ -245,7 +262,9 @@ export default function Home() {
             <div className="mt-6">
               <AlertDialog>
                 <AlertDialogTrigger asChild>
-                  <Button variant="destructive">Clear Completed Dates</Button>
+                  <div className="flex flex-col gap-2">
+                    <Button variant="destructive">Clear Completed Dates</Button>
+                  </div>
                 </AlertDialogTrigger>
                 <AlertDialogContent>
                   <AlertDialogHeader>
@@ -369,6 +388,44 @@ export default function Home() {
           </AlertDialogHeader>
           <AlertDialogFooter>
             <AlertDialogAction>OK</AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
+
+      <AlertDialog open={showWelcome} onOpenChange={setShowWelcome}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Welcome to the New York Times Mini Archive!</AlertDialogTitle>
+            <AlertDialogDescription className="space-y-4">
+              <p>
+                This tool helps you access past NYT Mini Crosswords without a subscription.
+              </p>
+              <p>
+                Features:
+                <br />
+                • Click any date to open that day&apos;s puzzle
+                <br />
+                • Tracks completed puzzles automatically
+                <br />
+                • Export your progress to use across devices
+                <br />
+                • Dark mode and other customization options
+              </p>
+              <div className="flex items-center space-x-2">
+                <Checkbox
+                  id="dontShowAgain"
+                  onCheckedChange={(checked) => {
+                    if (checked) {
+                      handleDontShowAgain();
+                    }
+                  }}
+                />
+                <label htmlFor="dontShowAgain">Don&apos;t show this message again</label>
+              </div>
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogAction>Get Started</AlertDialogAction>
           </AlertDialogFooter>
         </AlertDialogContent>
       </AlertDialog>
