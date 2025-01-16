@@ -290,7 +290,7 @@ export default function Home() {
       {/* Today's Mini Button */}
       <div className="relative flex flex-col items-center gap-2">
         <button
-          className="pointer-events-auto flex flex-col items-center gap-2 p-8 bg-transparent border-none cursor-pointer"
+          className="pointer-events-auto flex flex-col items-center gap-2 p-4 bg-transparent border-none cursor-pointer"
           onClick={goToToday}
         >
           <h1 className="text-xl font-bold mb-2">Today&apos;s Mini</h1>
