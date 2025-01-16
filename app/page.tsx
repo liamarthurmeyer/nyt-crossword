@@ -42,7 +42,7 @@ export default function Home() {
 
   const [weekStartsMonday, setWeekStartsMonday] = useState(false);
 
-  const [showWelcome, setShowWelcome] = useState(true);
+  const [showWelcome, setShowWelcome] = useState(false);
 
   useEffect(() => {
     // Only access localStorage in the browser
@@ -61,9 +61,14 @@ export default function Home() {
   useEffect(() => {
     if (typeof window !== 'undefined') {
       const dontShowAgain = localStorage.getItem('dontShowAgain') === 'true';
-      setShowWelcome(!dontShowAgain);
+      const hasSeenWelcomeThisSession = sessionStorage.getItem('hasSeenWelcome') === 'true';
+
+      if (!dontShowAgain && !hasSeenWelcomeThisSession) {
+        setShowWelcome(true);
+        sessionStorage.setItem('hasSeenWelcome', 'true');
+      }
     }
-  }, []);
+  }, []); // Only runs on mount
 
   const handleDateSelect = (selectedDate: Date | undefined) => {
     if (selectedDate) {
