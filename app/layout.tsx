@@ -3,6 +3,7 @@ import { Inter } from 'next/font/google';
 import "react-day-picker/dist/style.css";
 import './globals.css';
 import { ThemeProvider } from './ThemeContext'; // Import ThemeProvider
+import { Navigation } from '@/components/navigation';
 
 const inter = Inter({ subsets: ['latin'] });
 
@@ -47,6 +48,7 @@ export default function RootLayout({
       </head>
       <body className={`${inter.className}`}>
         <ThemeProvider>
+          <Navigation />
           {children}
         </ThemeProvider>
       </body>

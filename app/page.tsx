@@ -84,10 +84,6 @@ export default function Home() {
     }
   };
 
-  useEffect(() => {
-    console.log("Updated lastSelectedDate:", lastSelectedDate);
-  }, [lastSelectedDate]);
-
   const goToToday = () => {
     const latestPuzzleDate = getLatestAvailablePuzzle(); // Dynamically calculate the latest available puzzle
     handleDateSelect(latestPuzzleDate); // Navigate to the puzzle for that date
