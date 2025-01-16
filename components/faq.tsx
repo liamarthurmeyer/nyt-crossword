@@ -1,33 +1,32 @@
 export function FAQ() {
     return (
         <div className="container mx-auto max-w-2xl space-y-8">
-            <h1 className="text-3xl font-bold mb-8">Frequently Asked Questions</h1>
-
             <div className="space-y-6">
                 <section>
-                    <h2 className="text-xl font-semibold mb-2">What is the NYT Mini Crossword?</h2>
-                    <p>The Mini is a daily 5x5 crossword puzzle published by the New York Times, designed to be completed in just a few minutes.</p>
-                </section>
-
-                <section>
-                    <h2 className="text-xl font-semibold mb-2">When do new puzzles become available?</h2>
-                    <p>New Mini puzzles are released at 10 PM Eastern Time the night before their publish date, except for Sunday's puzzle which releases at 6 PM Eastern Time on Saturday.</p>
-                </section>
-
-                <section>
-                    <h2 className="text-xl font-semibold mb-2">How does this archive work?</h2>
-                    <p>This tool helps you track which Mini puzzles you've completed. Click any date to open that day's puzzle, and it will automatically be marked as completed.</p>
+                    <h2 className="text-xl font-semibold mb-2">About the Creator</h2>
+                    <p>This tool was made by Liam Meyer. I wanted to find a way to access past puzzles of my favorite crossword (the Mini), and stumbled upon the puzzles being publicly available, but with no way to directly access them besides using a direct link or accessing the archive by paying for an NYT subscription. I made this tool to automate that process for myself and others who also love the Mini! I am currently looking for an entry level SWE job, if you know of an opportunity, would like to introduce someone to me, or just want to chat. Contact me at <a href="mailto:xliamameyerx@gmail.com" className="text-blue-600 dark:text-blue-400 hover:underline">xliamameyerx@gmail.com</a></p>
                 </section>
 
                 <section>
                     <h2 className="text-xl font-semibold mb-2">Do I need a NYT subscription?</h2>
-                    <p>No! The Mini Crossword is free to play for everyone.</p>
+                    <p>No! With this website, all past Minis are free to play for everyone.</p>
                 </section>
 
                 <section>
                     <h2 className="text-xl font-semibold mb-2">How do I track my progress?</h2>
-                    <p>Your completed puzzles are automatically saved in your browser. You can export your progress from the Settings menu to transfer it between devices.</p>
+                    <p>Your completed puzzles are automatically saved in your browser when you open them. Previously completed puzzles outside of the website, or puzzles that you navigate to directly will not be tracked. You can export your progress from the Settings menu to transfer it between devices.</p>
                 </section>
+
+                <section>
+                    <h2 className="text-xl font-semibold mb-2">How does this archive work?</h2>
+                    <p>This tool redirects you by navigating directly to the Mini of the date you click. Click any date to open that day&apos;s puzzle, and it will open and automatically be marked as completed.</p>
+                </section>
+
+                <section>
+                    <h2 className="text-xl font-semibold mb-2">Would this work for other NYT games like Connections?</h2>
+                    <p>No, since the Mini was created long before the other games, it was implemented differently and hosted in a different section of the NYT website, which you can tell by the urls. nytimes.com/crosswords/game/mini (nyt =&gt; crosswords =&gt; game =&gt; mini) vs nytimes.com/games/connections (nyt =&gt; games =&gt; connections). Because of this, you cannot directly access past puzzles of other games from their URL without a subscription.</p>
+                </section>
+
             </div>
         </div>
     );

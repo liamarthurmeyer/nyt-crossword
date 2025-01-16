@@ -170,7 +170,7 @@ export default function Home() {
   };
 
   return (
-    <main className="flex min-h-screen flex-col items-center justify-between p-24">
+    <main className="flex min-h-screen flex-col items-center pt-8 gap-2">
 
       <Sheet>
         <SheetTrigger asChild>
@@ -293,7 +293,7 @@ export default function Home() {
           className="pointer-events-auto flex flex-col items-center gap-2 p-8 bg-transparent border-none cursor-pointer"
           onClick={goToToday}
         >
-          <h1 className="text-xl font-bold">Today&apos;s Mini</h1>
+          <h1 className="text-xl font-bold mb-2">Today&apos;s Mini</h1>
           <Image
             className="relative dark:drop-shadow-[0_0_0.3rem_#ffffff70]"
             src="/mini_logo.png"
@@ -309,12 +309,12 @@ export default function Home() {
       <div className="relative flex flex-col items-center w-[340px] h-[420px]">
         {loading ? (
           <div className="relative flex flex-col items-center w-full h-full">
-            <h1 className="mb-4 text-xl font-semibold">Find the Mini For a Specific Day</h1>
+            <h1 className="mb-2 text-xl font-semibold">Find the Mini For a Specific Day</h1>
             <DayPickerSkeleton />
           </div>
         ) : (
           <div className="relative flex flex-col items-center w-full h-full">
-            <h1 className="mb-4 text-xl font-semibold">Find the Mini For a Specific Day</h1>
+            <h1 className="mb-2 text-xl font-semibold">Find the Mini For a Specific Day</h1>
             <DayPicker
               mode="single"
               // selected={date}
@@ -347,7 +347,7 @@ export default function Home() {
       </div>
 
       {/* Random Puzzle Button */}
-      <div className="mt-6">
+      <div>
         <button
           className="px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-700"
           onClick={getRandomUncompletedDate}
