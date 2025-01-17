@@ -199,6 +199,7 @@ export default function Home() {
               <Switch
                 checked={weekStartsMonday}
                 onCheckedChange={handleWeekStartChange}
+                className="data-[state=unchecked]:dark:bg-gray-500"
               />
             </div>
             <div className="flex flex-col gap-2">
@@ -354,7 +355,7 @@ export default function Home() {
       {/* Random Puzzle Button */}
       <div>
         <button
-          className="px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-700 mb-10"
+          className="px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-700 mb-14"
           onClick={getRandomUncompletedDate}
         >
           Go to a Random Uncompleted Puzzle

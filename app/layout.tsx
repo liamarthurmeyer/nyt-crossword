@@ -9,7 +9,7 @@ const inter = Inter({ subsets: ['latin'] });
 
 export const metadata: Metadata = {
   title: 'Mini Archive',
-  description: 'Created by Liam Meyer',
+  description: 'Complete past NYT Mini crosswords without a subscription!',
   icons: {
     icon: [
       { url: '/favicon.ico' },
