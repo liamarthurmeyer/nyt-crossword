@@ -4,6 +4,7 @@ import "react-day-picker/dist/style.css";
 import './globals.css';
 import { ThemeProvider } from './ThemeContext'; // Import ThemeProvider
 import { Navigation } from '@/components/navigation';
+import { Analytics } from "@vercel/analytics/react"
 
 const inter = Inter({ subsets: ['latin'] });
 
@@ -51,6 +52,7 @@ export default function RootLayout({
           <Navigation />
           {children}
         </ThemeProvider>
+        <Analytics />
       </body>
     </html>
   );
